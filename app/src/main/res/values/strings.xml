@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">FilmFlix</string>
+    <string name="site_url">https://filmbd.pages.dev/</string>
+    <string name="offline_title">No connection</string>
+    <string name="offline_body">FilmFlix needs the internet. Check your connection and try again.</string>
+    <string name="retry">Retry</string>
+    <string name="exit_hint">Press back again to exit</string>
+</resources>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.FilmFlix" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/filmflix_black</item>
+        <item name="android:statusBarColor">@color/filmflix_black</item>
+        <item name="android:navigationBarColor">@color/filmflix_black</item>
+        <item name="android:colorAccent">@color/filmflix_red</item>
+    </style>
+</resources>
