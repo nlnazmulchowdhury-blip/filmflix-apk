@@ -42,7 +42,6 @@ public class MainActivity extends Activity {
     private ProgressBar progressBar;
     private FrameLayout root;
     private View customView;
-    private WebChromeClient chromeClient;
     private WebChromeClient.CustomViewCallback customViewCallback;
     private ValueCallback<Uri[]> fileChooserCallback;
     private long lastBackPress;
@@ -129,7 +128,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        WebChromeClient client = new WebChromeClient() {
+        view.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView v, int newProgress) {
                 progressBar.setProgress(newProgress);
@@ -163,17 +162,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onHideCustomView() {
-                if (customView == null) {
-                    return;
-                }
-                root.removeView(customView);
-                customView = null;
-                webView.setVisibility(View.VISIBLE);
-                if (customViewCallback != null) {
-                    customViewCallback.onCustomViewHidden();
-                    customViewCallback = null;
-                }
-                setFullscreen(false);
+                exitCustomView();
             }
 
             @Override
@@ -193,11 +182,7 @@ public class MainActivity extends Activity {
                 }
                 return true;
             }
-        };
-        view.setWebChromeClient(client);
-        if (view == webView) {
-            chromeClient = client;
-        }
+        });
 
         view.setDownloadListener(new DownloadListener() {
             @Override
@@ -223,6 +208,20 @@ public class MainActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void exitCustomView() {
+        if (customView == null) {
+            return;
+        }
+        root.removeView(customView);
+        customView = null;
+        webView.setVisibility(View.VISIBLE);
+        if (customViewCallback != null) {
+            customViewCallback.onCustomViewHidden();
+            customViewCallback = null;
+        }
+        setFullscreen(false);
     }
 
     private boolean handleExternal(Uri uri) {
@@ -325,14 +324,7 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (customView != null) {
-            webView.post(new Runnable() {
-                @Override
-                public void run() {
-                    if (chromeClient != null) {
-                        chromeClient.hideCustomView();
-                    }
-                }
-            });
+            exitCustomView();
             return;
         }
         if (webView.canGoBack()) {
