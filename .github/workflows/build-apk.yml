@@ -21,25 +21,31 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install platform and build tools
-        run: sdkmanager --install "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: Prepare Android SDK
+        run: |
+          SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          SDKM="$(find "$SDK/cmdline-tools" -name sdkmanager -type f | head -1)"
+          yes | "$SDKM" --licenses > /dev/null 2>&1 || true
+          if [ ! -d "$SDK/platforms/android-34" ]; then
+            "$SDKM" "platforms;android-34" "build-tools;34.0.0"
+          fi
+          ls "$SDK/platforms"
 
       - name: Build debug APK
         run: |
           chmod +x ./gradlew
           ./gradlew --no-daemon --stacktrace assembleDebug
 
-      - name: Rename artifact
+      - name: Stage artifact
         run: |
           mkdir -p out
-          cp app/build/outputs/apk/debug/app-debug.apk out/FilmFlix-v1.0.0-debug.apk
+          cp app/build/outputs/apk/debug/app-debug.apk out/FilmFlix-v1.0.0.apk
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: FilmFlix-APK
-          path: out/FilmFlix-v1.0.0-debug.apk
+          path: out/FilmFlix-v1.0.0.apk
           if-no-files-found: error
